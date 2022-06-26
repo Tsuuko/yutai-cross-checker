@@ -3,7 +3,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { ForIonicBase7Poff } from './types/ForIonicBase7Poff';
 
-type Data = ForIonicBase7Poff[];
+// type Data = ForIonicBase7Poff[];
+type Data = {
+  name: string;
+};
 
 export const config = {
   api: {
@@ -26,6 +29,7 @@ export default async function handler(
       },
     }
   );
-  res.status(200).json(r.data);
+  res.status(200).json({ name: 'John Doe' });
+  // res.status(200).json(r.data);
   // res.status(200).json(ForIonicBase7Poff);
 }
