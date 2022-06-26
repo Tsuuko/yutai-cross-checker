@@ -55,7 +55,7 @@ const Hukkatu: NextPage = () => {
       let nextCode: string | undefined;
       do {
         const reqData: ForIonicBase7PoffRequestBody = {
-          maxLength: 500,
+          maxLength: 1100,
           nextCode,
         };
         const r =
@@ -170,9 +170,7 @@ const Hukkatu: NextPage = () => {
           <option value="option3">Option 3</option>
         </Select> */}
       </HStack>
-      {isHukkatsuDataLoading || isBaseDataLoading
-        ? cardListSkelton
-        : cardListSkelton}
+      {isHukkatsuDataLoading || isBaseDataLoading ? cardListSkelton : cardList}
       {/* <Box>{JSON.stringify(hukkatsuData)}</Box> */}
     </Box>
   );
