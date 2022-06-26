@@ -1,6 +1,7 @@
-import { Box, Button, Heading, Stack, Text } from '@chakra-ui/react';
+import { Box, Link } from '@chakra-ui/react';
 import axios from 'axios';
 import type { NextPage } from 'next';
+import NextLink from 'next/link';
 import { useQuery } from 'react-query';
 
 import { ForIonicBase7Poff } from '../mock/api/ForIonicBase7Poff';
@@ -12,7 +13,11 @@ const Home: NextPage = () => {
   });
   return (
     <Box>
-      <Button>aaa</Button>
+      <Link as={NextLink} href="/hukkatsu">
+        hukkatsu
+      </Link>
+
+      {/* <Button>aaa</Button>
       <Stack>
         {data?.map((v) => (
           <Box rounded="md" borderWidth="1px">
@@ -24,7 +29,7 @@ const Home: NextPage = () => {
           </Box>
         ))}
       </Stack>
-      <Box>{JSON.stringify(data)}</Box>
+      <Box>{JSON.stringify(data)}</Box> */}
     </Box>
   );
 };
