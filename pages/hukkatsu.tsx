@@ -32,6 +32,7 @@ const Hukkatu: NextPage = () => {
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
       refetchInterval: false,
+      retry: false,
     }
   );
 
