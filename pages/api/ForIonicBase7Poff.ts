@@ -8,6 +8,7 @@ type Data = ForIonicBase7Poff[];
 export const config = {
   api: {
     responseLimit: false,
+    bodyParser: false,
   },
 };
 
