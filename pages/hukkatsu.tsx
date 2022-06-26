@@ -18,6 +18,13 @@ const Hukkatu: NextPage = () => {
     'ForIonicFukatsu',
     async () => {
       return (await axios.get<ForIonicFukatsu[]>('/api/ForIonicFukatsu')).data;
+    },
+    {
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchInterval: false,
+      retry: false,
     }
   );
 
