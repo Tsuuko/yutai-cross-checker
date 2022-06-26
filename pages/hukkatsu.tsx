@@ -43,7 +43,7 @@ const Hukkatu: NextPage = () => {
       let nextCode: string | undefined;
       do {
         const reqData: ForIonicBase7PoffRequestBody = {
-          maxLength: 500,
+          maxLength: 800,
           nextCode,
         };
         const r =
