@@ -1,5 +1,13 @@
 /* eslint-disable no-nested-ternary */
-import { Badge, Box, HStack, Select, Stack, Text } from '@chakra-ui/react';
+import {
+  Badge,
+  Box,
+  HStack,
+  Select,
+  Skeleton,
+  Stack,
+  Text,
+} from '@chakra-ui/react';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
@@ -22,7 +30,9 @@ dayjs.extend(utc);
 dayjs.tz.setDefault('Asia/Tokyo');
 
 const Hukkatu: NextPage = () => {
-  const { data: hukkatsuData } = useQuery<ForIonicFukatsu[]>(
+  const { data: hukkatsuData, isLoading: isHukkatsuDataLoading } = useQuery<
+    ForIonicFukatsu[]
+  >(
     'ForIonicFukatsu',
     async () => {
       return (await axios.get<ForIonicFukatsu[]>('/api/ForIonicFukatsu')).data;
@@ -36,7 +46,9 @@ const Hukkatu: NextPage = () => {
     }
   );
 
-  const { data: baseData } = useQuery<ForIonicBase7PoffResponseBody['data']>(
+  const { data: baseData, isLoading: isBaseDataLoading } = useQuery<
+    ForIonicBase7PoffResponseBody['data']
+  >(
     'ForIonicBase7Poff',
     async () => {
       let data: ForIonicBase7PoffResponseBody['data'] = [];
@@ -74,6 +86,56 @@ const Hukkatu: NextPage = () => {
   //   String(new Date().getMonth() + 1)
   // );
 
+  const cardListSkelton = (
+    <Stack m={3}>
+      <Stack rounded="md" borderWidth="1px" p={2}>
+        <Skeleton height="1rem" />
+        <Skeleton height="1rem" />
+      </Stack>
+      <Stack rounded="md" borderWidth="1px" p={2}>
+        <Skeleton height="1rem" />
+        <Skeleton height="1rem" />
+      </Stack>
+      <Stack rounded="md" borderWidth="1px" p={2}>
+        <Skeleton height="1rem" />
+        <Skeleton height="1rem" />
+      </Stack>
+    </Stack>
+  );
+  const cardList = (
+    <Stack m={3}>
+      {hukkatsuData
+        ?.filter((v) =>
+          selectedSyoken === 'all' ? true : selectedSyoken === v.syoken
+        )
+        .map((v) => {
+          const meigara = baseData?.find((f) => f.code === v.code);
+          return (
+            <Box
+              rounded="md"
+              borderWidth="1px"
+              p={2}
+              key={`${v.syoken}${v.code}${v.time}`}
+            >
+              <Text>
+                {dayjs(Number(v.time))
+                  .tz('Asia/Tokyo')
+                  .format('YYYY/MM/DD(ddd) hh:mm:ss')}
+              </Text>
+              <HStack>
+                <ShokenBadge shoken={v.syoken} />
+                <Text size="sm" fontWeight="bold">
+                  {`${v.code} ${meigara?.name || ''} 数量:${v.vol}`}
+                </Text>
+              </HStack>
+              {meigara && <Text>{meigara.yutai}</Text>}
+              {/* {JSON.stringify(v)} */}
+            </Box>
+          );
+        })}
+    </Stack>
+  );
+
   return (
     <Box>
       <HStack m={3}>
@@ -108,37 +170,9 @@ const Hukkatu: NextPage = () => {
           <option value="option3">Option 3</option>
         </Select> */}
       </HStack>
-      <Stack m={3}>
-        {hukkatsuData
-          ?.filter((v) =>
-            selectedSyoken === 'all' ? true : selectedSyoken === v.syoken
-          )
-          .map((v) => {
-            const meigara = baseData?.find((f) => f.code === v.code);
-            return (
-              <Box
-                rounded="md"
-                borderWidth="1px"
-                p={2}
-                key={`${v.syoken}${v.code}${v.time}`}
-              >
-                <Text>
-                  {dayjs(Number(v.time))
-                    .tz('Asia/Tokyo')
-                    .format('YYYY/MM/DD(ddd) hh:mm:ss')}
-                </Text>
-                <HStack>
-                  <ShokenBadge shoken={v.syoken} />
-                  <Text size="sm" fontWeight="bold">
-                    {`${v.code} ${meigara?.name || ''} 数量:${v.vol}`}
-                  </Text>
-                </HStack>
-                {meigara && <Text>{meigara.yutai}</Text>}
-                {/* {JSON.stringify(v)} */}
-              </Box>
-            );
-          })}
-      </Stack>
+      {isHukkatsuDataLoading || isBaseDataLoading
+        ? cardListSkelton
+        : cardListSkelton}
       {/* <Box>{JSON.stringify(hukkatsuData)}</Box> */}
     </Box>
   );
