@@ -1,17 +1,25 @@
 /* eslint-disable no-nested-ternary */
-import { Box, HStack, Select, Stack, Text } from '@chakra-ui/react';
+import { Badge, Box, HStack, Select, Stack, Text } from '@chakra-ui/react';
 import axios from 'axios';
 import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
 import type { NextPage } from 'next';
 import { useState } from 'react';
 import { useQuery } from 'react-query';
 
-import { ForIonicBase7Poff } from './api/types/ForIonicBase7Poff';
+import {
+  ForIonicBase7PoffRequestBody,
+  ForIonicBase7PoffResponseBody,
+} from './api/ForIonicBase7Poff';
 import { ForIonicFukatsu } from './api/types/ForIonicFukatsu';
 
 // type HukkatuProps = {
 //   baseData: ForIonicBase7Poff[];
 // };
+dayjs.extend(timezone);
+dayjs.extend(utc);
+dayjs.tz.setDefault('Asia/Tokyo');
 
 const Hukkatu: NextPage = () => {
   const { data: hukkatsuData } = useQuery<ForIonicFukatsu[]>(
@@ -28,11 +36,29 @@ const Hukkatu: NextPage = () => {
     }
   );
 
-  const { data: baseData } = useQuery<ForIonicBase7Poff[]>(
+  const { data: baseData } = useQuery<ForIonicBase7PoffResponseBody['data']>(
     'ForIonicBase7Poff',
     async () => {
-      return (await axios.get<ForIonicBase7Poff[]>('/api/ForIonicBase7Poff'))
-        .data;
+      let data: ForIonicBase7PoffResponseBody['data'] = [];
+      let nextCode: string | undefined;
+      do {
+        const reqData: ForIonicBase7PoffRequestBody = {
+          maxLength: 500,
+          nextCode,
+        };
+        const r =
+          // prettier-ignore
+          (
+          // eslint-disable-next-line no-await-in-loop
+          await axios.post<ForIonicBase7PoffResponseBody>(
+            '/api/ForIonicBase7Poff',reqData
+          )
+        ).data;
+        data = [...data, ...r.data];
+        nextCode = r.nextCode;
+      } while (nextCode);
+
+      return data;
     },
     {
       refetchOnMount: false,
@@ -88,23 +114,6 @@ const Hukkatu: NextPage = () => {
             selectedSyoken === 'all' ? true : selectedSyoken === v.syoken
           )
           .map((v) => {
-            const shoken =
-              v.syoken === 'n'
-                ? '日興'
-                : v.syoken === 's'
-                ? 'SBI'
-                : v.syoken === 'k'
-                ? 'カブコム'
-                : v.syoken === 'g'
-                ? 'GMO'
-                : v.syoken === 'r'
-                ? '楽天'
-                : v.syoken === 'x'
-                ? 'マネックス'
-                : v.syoken === 'm'
-                ? '松井'
-                : v.syoken;
-
             const meigara = baseData?.find((f) => f.code === v.code);
             return (
               <Box
@@ -113,11 +122,17 @@ const Hukkatu: NextPage = () => {
                 p={2}
                 key={`${v.syoken}${v.code}${v.time}`}
               >
-                <Text size="sm" fontWeight="bold">
-                  {`[${shoken}] (${dayjs(v.time).format('hh:mm:ss')}) ${
-                    meigara?.name || ''
-                  } ${v.code}  数量:${v.vol}`}
+                <Text>
+                  {dayjs(Number(v.time))
+                    .tz('Asia/Tokyo')
+                    .format('YYYY/MM/DD(ddd) hh:mm:ss')}
                 </Text>
+                <HStack>
+                  <ShokenBadge shoken={v.syoken} />
+                  <Text size="sm" fontWeight="bold">
+                    {`${v.code} ${meigara?.name || ''} 数量:${v.vol}`}
+                  </Text>
+                </HStack>
                 {meigara && <Text>{meigara.yutai}</Text>}
                 {/* {JSON.stringify(v)} */}
               </Box>
@@ -130,6 +145,30 @@ const Hukkatu: NextPage = () => {
 };
 
 export default Hukkatu;
+
+type ShokenBadgeProps = {
+  shoken: 'n' | 's' | 'k' | 'g' | 'r' | 'x' | 'm';
+};
+const ShokenBadge: React.FC<ShokenBadgeProps> = ({ shoken }) => {
+  switch (shoken) {
+    case 'n':
+      return <Badge colorScheme="red">日興</Badge>;
+    case 's':
+      return <Badge colorScheme="blue">SBI</Badge>;
+    case 'k':
+      return <Badge colorScheme="orange">カブコム</Badge>;
+    case 'g':
+      return <Badge colorScheme="blue">GMO</Badge>;
+    case 'r':
+      return <Badge colorScheme="purple">楽天</Badge>;
+    case 'x':
+      return <Badge colorScheme="teal">マネックス</Badge>;
+    case 'm':
+      return <Badge colorScheme="pink">松井</Badge>;
+    default:
+      return <Badge>{shoken}</Badge>;
+  }
+};
 
 // export const getServerSideProps: GetServerSideProps = async (context) => {
 //   // APIやDBからのデータ取得処理などを記載

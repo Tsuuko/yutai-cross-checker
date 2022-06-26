@@ -1,16 +1,12 @@
 import { Box, Link } from '@chakra-ui/react';
-import axios from 'axios';
 import type { NextPage } from 'next';
 import NextLink from 'next/link';
-import { useQuery } from 'react-query';
-
-import { ForIonicBase7Poff } from '../mock/api/ForIonicBase7Poff';
 
 const Home: NextPage = () => {
-  const { data } = useQuery<typeof ForIonicBase7Poff>('todos', async () => {
-    return (await axios.get<typeof ForIonicBase7Poff>('/api/ForIonicBase7Poff'))
-      .data;
-  });
+  // const { data } = useQuery<typeof ForIonicBase7Poff>('todos', async () => {
+  //   return (await axios.get<typeof ForIonicBase7Poff>('/api/ForIonicBase7Poff'))
+  //     .data;
+  // });
   return (
     <Box>
       <Link as={NextLink} href="/hukkatsu">
