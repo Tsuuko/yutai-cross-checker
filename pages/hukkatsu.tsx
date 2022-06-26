@@ -6,24 +6,32 @@ import type { NextPage } from 'next';
 import { useState } from 'react';
 import { useQuery } from 'react-query';
 
-import { ForIonicBase7Poff } from '../mock/api/ForIonicBase7Poff';
-import { ForIonicFukatsu } from '../mock/api/ForIonicFukatsu';
+import { ForIonicBase7Poff } from './api/types/ForIonicBase7Poff';
+import { ForIonicFukatsu } from './api/types/ForIonicFukatsu';
+
+// type HukkatuProps = {
+//   baseData: ForIonicBase7Poff[];
+// };
 
 const Hukkatu: NextPage = () => {
-  const { data: hukkatsuData } = useQuery<typeof ForIonicFukatsu>(
+  const { data: hukkatsuData } = useQuery<ForIonicFukatsu[]>(
     'ForIonicFukatsu',
     async () => {
-      return (await axios.get<typeof ForIonicFukatsu>('/api/ForIonicFukatsu'))
-        .data;
+      return (await axios.get<ForIonicFukatsu[]>('/api/ForIonicFukatsu')).data;
     }
   );
 
-  const { data: allData } = useQuery<typeof ForIonicBase7Poff>(
+  const { data: baseData } = useQuery<ForIonicBase7Poff[]>(
     'ForIonicBase7Poff',
     async () => {
-      return (
-        await axios.get<typeof ForIonicBase7Poff>('/api/ForIonicBase7Poff')
-      ).data;
+      return (await axios.get<ForIonicBase7Poff[]>('/api/ForIonicBase7Poff'))
+        .data;
+    },
+    {
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchInterval: false,
     }
   );
 
@@ -89,7 +97,7 @@ const Hukkatu: NextPage = () => {
                 ? '松井'
                 : v.syoken;
 
-            const meigara = allData?.find((f) => f.code === v.code);
+            const meigara = baseData?.find((f) => f.code === v.code);
             return (
               <Box
                 rounded="md"
@@ -114,3 +122,32 @@ const Hukkatu: NextPage = () => {
 };
 
 export default Hukkatu;
+
+// export const getServerSideProps: GetServerSideProps = async (context) => {
+//   // APIやDBからのデータ取得処理などを記載
+//   let baseData: ForIonicBase7Poff[];
+//   try {
+//     baseData = (
+//       await axios.post<ForIonicBase7Poff[]>(
+//         'https://gokigen-life.tokyo/api/00ForWeb/ForIonicBase7Poff.php',
+//         undefined,
+//         {
+//           headers: {
+//             Origin: 'ionic://localhost',
+//             'User-Agent': 'Googlebot/2.1 (+http://www.google.com/bot.html)',
+//           },
+//         }
+//       )
+//     ).data;
+//   } catch (error) {
+//     baseData = [];
+//   }
+
+//   const props: HukkatuProps = {
+//     baseData,
+//   };
+
+//   return {
+//     props,
+//   };
+// };

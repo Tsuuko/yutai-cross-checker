@@ -3,13 +3,19 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { ForIonicBase7Poff } from './types/ForIonicBase7Poff';
 
-type Data = ForIonicBase7Poff;
+type Data = ForIonicBase7Poff[];
+
+export const config = {
+  api: {
+    responseLimit: false,
+  },
+};
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  const r = await axios.post<ForIonicBase7Poff>(
+  const r = await axios.post<ForIonicBase7Poff[]>(
     'https://gokigen-life.tokyo/api/00ForWeb/ForIonicBase7Poff.php',
     undefined,
     {

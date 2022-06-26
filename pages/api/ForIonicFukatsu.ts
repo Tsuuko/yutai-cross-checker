@@ -3,13 +3,13 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { ForIonicFukatsu } from './types/ForIonicFukatsu';
 
-type Data = ForIonicFukatsu;
+type Data = ForIonicFukatsu[];
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  const r = await axios.post<ForIonicFukatsu>(
+  const r = await axios.post<ForIonicFukatsu[]>(
     'https://gokigen-life.tokyo/api/00ForWeb/ForIonicFukatsu.php',
     {
       code: '0000',
